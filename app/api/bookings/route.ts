@@ -1,0 +1,75 @@
+import { NextResponse } from "next/server";
+import { adminDb } from "@/lib/firebaseAdmin";
+
+export async function POST(req: Request) {
+  try {
+    const body = await req.json();
+    const { eventId, name, email, seats } = body as {
+      eventId?: string;
+      name?: string;
+      email?: string;
+      seats?: string[];
+    };
+
+    if (
+      !eventId ||
+      !name ||
+      !email ||
+      !Array.isArray(seats) ||
+      seats.length === 0
+    ) {
+      return NextResponse.json(
+        { error: "Missing required booking fields" },
+        { status: 400 }
+      );
+    }
+
+    const result = await adminDb.runTransaction(async (transaction) => {
+      const eventRef = adminDb.collection("events").doc(eventId);
+      const eventSnap = await transaction.get(eventRef);
+
+      if (!eventSnap.exists) {
+        throw new Error("Event not found");
+      }
+
+      const eventData = eventSnap.data() || {};
+      const bookedSeats: string[] = Array.isArray(eventData.bookedSeats)
+        ? eventData.bookedSeats
+        : [];
+
+      const alreadyTaken = seats.some((seat) => bookedSeats.includes(seat));
+
+      if (alreadyTaken) {
+        throw new Error("Some selected seats are already booked");
+      }
+
+      const updatedBookedSeats = [...bookedSeats, ...seats];
+
+      transaction.update(eventRef, {
+        bookedSeats: updatedBookedSeats,
+      });
+
+      const bookingRef = adminDb.collection("bookings").doc();
+
+      transaction.set(bookingRef, {
+        eventId,
+        name,
+        email,
+        seats,
+        createdAt: new Date().toISOString(),
+      });
+
+      return { id: bookingRef.id };
+    });
+
+    return NextResponse.json({
+      success: true,
+      id: result.id,
+    });
+  } catch (error: any) {
+    return NextResponse.json(
+      { error: error.message || "Booking failed" },
+      { status: 400 }
+    );
+  }
+}
