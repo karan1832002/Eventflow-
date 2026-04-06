@@ -27,38 +27,53 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="mx-auto max-w-md p-6">
-      <h1 className="mb-6 text-2xl font-bold">Sign up</h1>
+    <div className="flex min-h-[80vh] items-center justify-center px-6 py-12">
+      <div className="w-full max-w-md bg-white rounded-[2rem] p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Create an account</h1>
+          <p className="text-slate-500 mt-2">Sign up to book seats and explore exclusive events.</p>
+        </div>
 
-      <form onSubmit={handleRegister} className="space-y-4">
-        <input
-          type="email"
-          placeholder="Email"
-          className="w-full rounded border p-3"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
+        <form onSubmit={handleRegister} className="space-y-5">
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-1.5">Email Address</label>
+            <input
+              type="email"
+              placeholder="you@example.com"
+              className="block w-full rounded-xl border-0 py-3.5 px-4 text-slate-900 ring-1 ring-inset ring-slate-200 placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 shadow-sm transition"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
 
-        <input
-          type="password"
-          placeholder="Password"
-          className="w-full rounded border p-3"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-1.5">Password</label>
+            <input
+              type="password"
+              placeholder="••••••••"
+              className="block w-full rounded-xl border-0 py-3.5 px-4 text-slate-900 ring-1 ring-inset ring-slate-200 placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 shadow-sm transition"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
 
-        {error && <p className="text-sm text-red-600">{error}</p>}
+          {error && <p className="text-sm font-medium text-red-500">{error}</p>}
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full rounded bg-black px-4 py-3 text-white"
-        >
-          {loading ? "Creating account..." : "Sign up"}
-        </button>
-      </form>
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full rounded-xl bg-indigo-600 px-4 py-3.5 text-sm font-bold !text-white shadow hover:bg-indigo-500 transition-all active:scale-[0.98] mt-2 disabled:opacity-70 disabled:cursor-not-allowed"
+          >
+            {loading ? "Creating account..." : "Sign up"}
+          </button>
+        </form>
+
+        <p className="text-center text-sm text-slate-500 mt-6">
+          Already have an account? <a href="/login" className="font-bold text-indigo-600 hover:text-indigo-500">Log in</a>
+        </p>
+      </div>
     </div>
   );
 }

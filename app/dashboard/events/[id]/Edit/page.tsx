@@ -137,7 +137,7 @@ export default function EditEventPage() {
             <button
               type="submit"
               disabled={saving}
-              className="rounded-xl bg-indigo-600 px-6 py-3 font-semibold text-white hover:bg-indigo-700"
+              className="rounded-xl bg-indigo-600 px-6 py-3 font-semibold !text-white hover:bg-indigo-700"
             >
               {saving ? "Saving..." : "Update Event"}
             </button>

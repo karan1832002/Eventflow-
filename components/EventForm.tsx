@@ -9,23 +9,109 @@ export default function EventForm({ initial = {}, onSubmit }: any) {
   const [time, setTime] = useState(initial.time || "");
   const [location, setLocation] = useState(initial.location || "");
   const [capacity, setCapacity] = useState(initial.capacity || 50);
+  const [price, setPrice] = useState(initial.price || 0);
 
   return (
-    <form
-      className="flex flex-col gap-3"
-      onSubmit={(e) => {
-        e.preventDefault();
-        onSubmit({ title, description, date, time, location, capacity });
-      }}
-    >
-      <input className="border p-2" placeholder="Title" value={title} onChange={(e) => setTitle(e.target.value)} />
-      <textarea className="border p-2" placeholder="Description" value={description} onChange={(e) => setDescription(e.target.value)} />
-      <input type="date" className="border p-2" value={date} onChange={(e) => setDate(e.target.value)} />
-      <input type="time" className="border p-2" value={time} onChange={(e) => setTime(e.target.value)} />
-      <input className="border p-2" placeholder="Location" value={location} onChange={(e) => setLocation(e.target.value)} />
-      <input type="number" className="border p-2" value={capacity} onChange={(e) => setCapacity(Number(e.target.value))} />
+    <div className="bg-white rounded-[2rem] border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-8 max-w-3xl mx-auto">
+      <h2 className="text-2xl font-bold text-slate-900 mb-8 pb-4 border-b border-slate-100">
+        {initial.id ? "Edit Event" : "Event Details"}
+      </h2>
+      
+      <form
+        className="space-y-6"
+        onSubmit={(e) => {
+          e.preventDefault();
+          onSubmit({ title, description, date, time, location, capacity: Number(capacity), price: Number(price) });
+        }}
+      >
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-1.5">Event Title</label>
+            <input 
+              className="block w-full rounded-xl border-0 py-3 px-4 text-slate-900 ring-1 ring-inset ring-slate-200 placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 shadow-sm transition" 
+              placeholder="e.g. Next.js Developer Conference"
+              value={title} 
+              onChange={(e) => setTitle(e.target.value)} 
+              required
+            />
+          </div>
 
-      <button className="bg-blue-600 text-white p-2 rounded">Save</button>
-    </form>
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-1.5">Description</label>
+            <textarea 
+              className="block w-full rounded-xl border-0 py-3 px-4 text-slate-900 ring-1 ring-inset ring-slate-200 placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 shadow-sm transition min-h-[120px] resize-y" 
+              placeholder="Describe what the event is about..."
+              value={description} 
+              onChange={(e) => setDescription(e.target.value)} 
+            />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-1.5">Date</label>
+              <input 
+                type="date" 
+                className="block w-full rounded-xl border-0 py-3 px-4 text-slate-900 ring-1 ring-inset ring-slate-200 placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 shadow-sm transition" 
+                value={date} 
+                onChange={(e) => setDate(e.target.value)} 
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-1.5">Time</label>
+              <input 
+                type="time" 
+                className="block w-full rounded-xl border-0 py-3 px-4 text-slate-900 ring-1 ring-inset ring-slate-200 placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 shadow-sm transition" 
+                value={time} 
+                onChange={(e) => setTime(e.target.value)} 
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-1.5">Location</label>
+            <input 
+              className="block w-full rounded-xl border-0 py-3 px-4 text-slate-900 ring-1 ring-inset ring-slate-200 placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 shadow-sm transition" 
+              placeholder="e.g. San Francisco Convention Center"
+              value={location} 
+              onChange={(e) => setLocation(e.target.value)} 
+              required
+            />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-1.5">Price ($)</label>
+              <input 
+                type="number" 
+                min="0"
+                className="block w-full rounded-xl border-0 py-3 px-4 text-slate-900 ring-1 ring-inset ring-slate-200 placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 shadow-sm transition" 
+                value={price} 
+                onChange={(e) => setPrice(Number(e.target.value))} 
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-1.5">Total Capacity</label>
+              <input 
+                type="number" 
+                min="1"
+                className="block w-full rounded-xl border-0 py-3 px-4 text-slate-900 ring-1 ring-inset ring-slate-200 placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 shadow-sm transition" 
+                value={capacity} 
+                onChange={(e) => setCapacity(Number(e.target.value))} 
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="pt-6 mt-6 border-t border-slate-100 flex justify-end">
+          <button 
+            type="submit" 
+            className="rounded-xl bg-indigo-600 px-8 py-3.5 text-sm font-bold !text-white shadow hover:bg-indigo-500 transition-all active:scale-[0.98]"
+          >
+            Save Event
+          </button>
+        </div>
+      </form>
+    </div>
   );
 }

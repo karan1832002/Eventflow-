@@ -62,6 +62,8 @@ export async function POST(req: Request) {
       return { id: bookingRef.id };
     });
 
+    console.log(`[MOCK EMAIL SENT] to ${email} for Booking ${result.id}`);
+
     return NextResponse.json({
       success: true,
       id: result.id,

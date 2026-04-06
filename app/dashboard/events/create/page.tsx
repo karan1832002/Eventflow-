@@ -126,7 +126,7 @@ export default function DashboardPage() {
           <button
             type="submit"
             disabled={loading}
-            className="rounded-xl bg-indigo-600 px-6 py-3 font-semibold text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-70"
+            className="rounded-xl bg-indigo-600 px-6 py-3 font-semibold !text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-70"
           >
             {loading ? "Creating..." : "Create Event"}
           </button>

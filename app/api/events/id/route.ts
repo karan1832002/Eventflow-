@@ -8,4 +8,4 @@ export async function PUT(req: NextRequest, { params }: any) {
   const [, token] = authHeader.split(" ");
   const decoded = await adminAuth.verifyIdToken(token);
 
-  const docRef = adminDb.collection("events").doc
+  const docRef = adminDb.collection("events").doc }

@@ -6,24 +6,19 @@ export default async function EventsPage() {
   const events = snap.docs.map((d) => ({ id: d.id, ...(d.data() as any) }));
 
   return (
-    <main className="mx-auto max-w-7xl px-6 py-10">
-      
-      {/* Header */}
+    <main className="mx-auto max-w-7xl px-6 py-12">
       <div className="mb-10">
-        <p className="text-sm font-semibold text-indigo-600 uppercase tracking-wide">
-          Discover Events
+        <p className="text-sm font-bold text-indigo-600 uppercase tracking-widest">
+          Explore
         </p>
-
-        <h1 className="text-4xl font-extrabold text-slate-900 mt-2">
+        <h1 className="text-4xl md:text-5xl font-extrabold text-slate-900 mt-2 mb-4">
           All Events
         </h1>
-
-        <p className="text-slate-600 mt-3 max-w-xl">
-          Explore upcoming events, book seats, and enjoy amazing experiences.
+        <p className="text-lg text-slate-600 max-w-xl">
+          Search and filter through all upcoming events and secure your booking today.
         </p>
       </div>
 
-      {/* Empty state */}
       {events.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-slate-300 p-10 text-center text-slate-500 bg-white">
           No events available yet.
