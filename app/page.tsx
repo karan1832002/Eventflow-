@@ -22,7 +22,7 @@ export default async function HomePage() {
         </p>
       </div>
 
-      // had to be put into another component as async hates useState
+      {" had to be put into another component as async hates useState "}
       <SearchBar events={events} />
 
     </main>
