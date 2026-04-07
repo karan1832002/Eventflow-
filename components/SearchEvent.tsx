@@ -14,11 +14,18 @@ export default function SearchBar({ events }: SearchClientProps) {
   const filteredEvents = events.filter((e) => {
     const query = searchString.trim().toLowerCase(); // grabs the search string
 
-    // if it starts with a hashtag search by location instead
-    if (query.startsWith("#")) {
-      const locationQuery = query.replace("#", "").trim();
+    // if it starts with place: search by location instead
+    if (query.startsWith("place:")) {
+      const locationQuery = query.replace("place:", "").trim();
 
       return e.location.toLowerCase().includes(locationQuery);
+    }
+
+    // if it starts with date: search by date instead
+    if (query.startsWith("date:")) {
+      const dateQuery = query.replace("date:", "").trim();
+
+      return e.date.includes(dateQuery);
     }
 
     // if no hashtag search by title instead
