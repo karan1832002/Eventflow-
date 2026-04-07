@@ -10,11 +10,21 @@ type SearchClientProps = {
 export default function SearchBar({ events }: SearchClientProps) {
   const [searchString, setSearchString] = useState("");
 
-  // funky guy that updates when search string changes,
-  // if an events title doesnt match the search string it isnt included 
-  const filteredEvents = events.filter((e) =>
-    e.title.toLowerCase().includes(searchString.toLowerCase())
-  );
+  // funky guy that updates when search string changes, help from ai
+  const filteredEvents = events.filter((e) => {
+    const query = searchString.trim().toLowerCase(); // grabs the search string
+
+    // if it starts with a hashtag search by location instead
+    if (query.startsWith("#")) {
+      const locationQuery = query.replace("#", "").trim();
+
+      return e.location.toLowerCase().includes(locationQuery);
+    }
+
+    // if no hashtag search by title instead
+    return e.title.toLowerCase().includes(query);
+  });
+
 
   return (
     <>
