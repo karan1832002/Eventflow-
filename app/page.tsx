@@ -1,4 +1,3 @@
-import EventCard from "@/components/EventsCard";
 import SearchBar from "@/components/SearchEvent";
 import { adminDb } from "@/lib/firebaseAdmin";
 
@@ -6,9 +5,6 @@ import { adminDb } from "@/lib/firebaseAdmin";
 export default async function HomePage() {
   const snap = await adminDb.collection("events").orderBy("date", "asc").get();
   const events = snap.docs.map((d) => ({ id: d.id, ...(d.data() as any) }));
-  const searchString = "";
-
-
 
 
   return (
