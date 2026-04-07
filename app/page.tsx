@@ -1,4 +1,5 @@
 import EventCard from "@/components/EventsCard";
+import SearchBar from "@/components/SearchBar";
 import { adminDb } from "@/lib/firebaseAdmin";
 
 export default async function HomePage() {
@@ -15,7 +16,11 @@ export default async function HomePage() {
           Book seats for the best tech, design, and business events happening around you. Stay ahead of the curve.
         </p>
       </div>
-      
+
+      <SearchBar/>
+
+
+
       {events.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-slate-300 p-10 text-center text-slate-500 bg-white">
           No events available yet.
