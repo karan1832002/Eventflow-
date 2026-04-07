@@ -1,10 +1,15 @@
 import EventCard from "@/components/EventsCard";
-import SearchBar from "@/components/SearchBar";
+import SearchBar from "@/components/SearchEvent";
 import { adminDb } from "@/lib/firebaseAdmin";
+
 
 export default async function HomePage() {
   const snap = await adminDb.collection("events").orderBy("date", "asc").get();
   const events = snap.docs.map((d) => ({ id: d.id, ...(d.data() as any) }));
+  const searchString = "";
+
+
+
 
   return (
     <main className="mx-auto max-w-7xl px-6 py-12">
@@ -17,21 +22,8 @@ export default async function HomePage() {
         </p>
       </div>
 
-      <SearchBar/>
+      <SearchBar events={events} />
 
-
-
-      {events.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-slate-300 p-10 text-center text-slate-500 bg-white">
-          No events available yet.
-        </div>
-      ) : (
-        <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
-          {events.map((e) => (
-            <EventCard key={e.id} event={e} />
-          ))}
-        </div>
-      )}
     </main>
   );
 }
