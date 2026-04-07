@@ -10,6 +10,8 @@ type SearchClientProps = {
 export default function SearchBar({ events }: SearchClientProps) {
   const [searchString, setSearchString] = useState("");
 
+  // funky guy that updates when search string changes,
+  // if an events title doesnt match the search string it isnt included 
   const filteredEvents = events.filter((e) =>
     e.title.toLowerCase().includes(searchString.toLowerCase())
   );
@@ -21,18 +23,18 @@ export default function SearchBar({ events }: SearchClientProps) {
           type="text"
           value={searchString}
           onChange={(e) => setSearchString(e.target.value)}
-          placeholder="Search..."
+          placeholder="Search for an event..."
           className="w-full rounded border border-gray-300 px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300"
         />
       </form>
 
       {filteredEvents.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-slate-300 p-10 text-center text-slate-500 bg-white">
-          No matching events.
+          No events found.
         </div>
       ) : (
         <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
-          {filteredEvents.map((e) => (
+          {filteredEvents.map((e) => (  // runs filtered events,  which is the events arrays but filtered based on what the search string is
             <EventCard key={e.id} event={e} />
           ))}
         </div>
