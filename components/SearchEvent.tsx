@@ -24,12 +24,6 @@ export default function SearchBar({ events }: SearchClientProps) {
           placeholder="Search..."
           className="w-full rounded border border-gray-300 px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300"
         />
-        <button
-          type="submit"
-          className="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
-        >
-          Search
-        </button>
       </form>
 
       {filteredEvents.length === 0 ? (
