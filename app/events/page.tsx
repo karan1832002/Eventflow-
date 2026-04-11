@@ -1,4 +1,4 @@
-import EventCard from "@/components/EventsCard";
+import SearchBar from "@/components/SearchEvent";
 import { adminDb } from "@/lib/firebaseAdmin";
 
 export default async function EventsPage() {
@@ -19,17 +19,8 @@ export default async function EventsPage() {
         </p>
       </div>
 
-      {events.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-slate-300 p-10 text-center text-slate-500 bg-white">
-          No events available yet.
-        </div>
-      ) : (
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {events.map((e) => (
-            <EventCard key={e.id} event={e} />
-          ))}
-        </div>
-      )}
+      <SearchBar events={events}/>
+
     </main>
   );
 }
