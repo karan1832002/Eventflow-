@@ -1,7 +1,7 @@
 import Navbar from "@/components/Navbar";
 import BookingButton from "@/components/BookingButton";
 import { adminDb } from "@/lib/firebaseAdmin";
-import { notFound } from "next/navigation";
+import EventMap from  "@/components/EventMap";
 
 export default async function EventDetails({ params }: { params: { id: string } }) {
   const id = params?.id;
@@ -27,6 +27,10 @@ export default async function EventDetails({ params }: { params: { id: string } 
         <p className="text-sm text-gray-500">
           {event.date} • {event.time} • {event.location}
         </p>
+
+        <div className="sticky top-28 bg-white rounded-[2rem] p-8 shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-slate-100">
+          <EventMap location={event.location} />
+        </div>
 
         <BookingButton eventId={event.id} />
       </main>
