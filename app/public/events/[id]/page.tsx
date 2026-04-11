@@ -1,10 +1,20 @@
 import Navbar from "@/components/Navbar";
 import BookingButton from "@/components/BookingButton";
 import { adminDb } from "@/lib/firebaseAdmin";
+import { notFound } from "next/navigation";
 
-export default async function EventDetails({ params }: any) {
-  const doc = await adminDb.collection("events").doc(params.id).get();
-  if (!doc.exists) return <div>Event not found</div>;
+export default async function EventDetails({ params }: { params: { id: string } }) {
+  const id = params?.id;
+
+  if (!id) {
+    notFound();
+  }
+
+  const doc = await adminDb.collection("events").doc(id).get();
+
+  if (!doc.exists) {
+    notFound();
+  }
 
   const event = { id: doc.id, ...(doc.data() as any) };
 
