@@ -1,22 +1,43 @@
 import Navbar from "@/components/Navbar";
 import BookingButton from "@/components/BookingButton";
 import { adminDb } from "@/lib/firebaseAdmin";
-import EventMap from  "@/components/EventMap";
+import EventMap from "@/components/EventMap";
 
-export default async function EventDetails({ params }: { params: { id: string } }) {
-  const id = params?.id;
+type Event = {
+  id: string;
+  title: string;
+  description: string;
+  date: string;
+  time: string;
+  location: string;
+};
 
-  if (!id) {
-    notFound();
-  }
+export default async function EventDetails({
+  params,
+}: {
+  params: { id: string };
+}) {
+  const id = params.id;
 
   const doc = await adminDb.collection("events").doc(id).get();
 
   if (!doc.exists) {
-    notFound();
+    throw new Error("Event not found");
   }
 
-  const event = { id: doc.id, ...(doc.data() as any) };
+  const data = doc.data();
+  if (!data) {
+    throw new Error("Event data is missing");
+  }
+
+  const event: Event = {
+    id: doc.id,
+    title: data.title,
+    description: data.description,
+    date: data.date,
+    time: data.time,
+    location: data.location,
+  };
 
   return (
     <>
