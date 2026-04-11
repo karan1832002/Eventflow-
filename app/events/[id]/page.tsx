@@ -1,5 +1,6 @@
 import { adminDb } from "@/lib/firebaseAdmin";
 import BookingForm from "@/components/BookingForm";
+import EventMap from "@/components/EventMap";
 import { Calendar, Clock, MapPin, Tag } from "lucide-react";
 
 export default async function EventDetailsPage({
@@ -70,11 +71,16 @@ export default async function EventDetailsPage({
                 <p className="font-semibold text-slate-900">{event.location}</p>
               </div>
             </div>
+            
           </div>
+          <div className="sticky top-28 bg-white rounded-[2rem] p-8 shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-slate-100">
+              <EventMap location={event.location} />
+            </div>
         </div>
 
         {/* Right Column - Booking */}
         <div className="relative">
+          
           <div className="sticky top-28 bg-white rounded-[2rem] p-8 shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-slate-100">
             <div className="flex justify-between items-end mb-8 border-b border-slate-100 pb-6">
               <div>
@@ -87,6 +93,7 @@ export default async function EventDetailsPage({
                 </span>
                 {event.price && event.price > 0 && <p className="text-slate-400 text-xs font-semibold uppercase tracking-wider mt-1">Per Seat</p>}
               </div>
+              
             </div>
             
             <BookingForm eventId={event.id} />
