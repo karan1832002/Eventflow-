@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { adminDb } from "@/lib/firebaseAdmin";
+import { sendPaymentLinkEmail } from "@/lib/email";
 
 export async function POST(req: Request) {
   try {
@@ -56,17 +57,24 @@ export async function POST(req: Request) {
         name,
         email,
         seats,
+        status: "pending_payment",
         createdAt: new Date().toISOString(),
       });
 
       return { id: bookingRef.id };
     });
 
-    console.log(`[MOCK EMAIL SENT] to ${email} for Booking ${result.id}`);
+    await sendPaymentLinkEmail({
+      name,
+      email,
+      seats,
+      bookingId: result.id,
+    });
 
     return NextResponse.json({
       success: true,
       id: result.id,
+      message: "Booking created and payment link sent by email",
     });
   } catch (error: any) {
     return NextResponse.json(
