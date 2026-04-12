@@ -40,7 +40,7 @@ export default function EditEventPage() {
       price: Number(formData.price),
     });
 
-    router.push("/dashboard/events");
+    router.push("/dashboard");
   };
 
   if (!initial) {
