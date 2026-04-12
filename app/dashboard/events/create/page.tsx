@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 export default function DashboardPage() {
   const router = useRouter();
   const [title, setTitle] = useState("");
+  const [category, setCategory] = useState("");
   const [location, setLocation] = useState("");
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
@@ -31,6 +32,7 @@ export default function DashboardPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           title,
+          category,
           location,
           date,
           time,
@@ -43,6 +45,7 @@ export default function DashboardPage() {
       if (!res.ok) throw new Error("Failed to create event");
 
       setTitle("");
+      setCategory("");
       setLocation("");
       setDate("");
       setTime("");
@@ -67,7 +70,7 @@ export default function DashboardPage() {
             Create Event
           </h1>
           <p className="mt-2 text-slate-600">
-            Add a new event with title, date, time, location, and pricing.
+            Add a new event with title, category, date, time, location, and pricing.
           </p>
         </div>
 
@@ -79,6 +82,28 @@ export default function DashboardPage() {
             onChange={(e) => setTitle(e.target.value)}
             required
           />
+
+          <select
+            className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            required
+          >
+            <option value="">Select category</option>
+            <option value="Music">Music</option>
+            <option value="Sports">Sports</option>
+            <option value="Tech">Tech</option>
+            <option value="Education">Education</option>
+            <option value="Business">Business</option>
+            <option value="Food">Food</option>
+            <option value="Fashion">Fashion</option>
+            <option value="Art">Art</option>
+            <option value="Comedy">Comedy</option>
+            <option value="Workshop">Workshop</option>
+            <option value="Seminar">Seminar</option>
+            <option value="Conference">Conference</option>
+            <option value="Others">Others</option>
+          </select>
 
           <input
             className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"

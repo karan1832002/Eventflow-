@@ -1,0 +1,15 @@
+export const EVENT_CATEGORIES = [
+  "Music",
+  "Sports",
+  "Tech",
+  "Education",
+  "Business",
+  "Food",
+  "Fashion",
+  "Art",
+  "Comedy",
+  "Workshop",
+  "Seminar",
+  "Conference",
+  "Others",
+];

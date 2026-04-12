@@ -15,6 +15,8 @@ export interface Event {
   date: string;
   time: string;
   location: string;
+  category: string;
+  price: number;
   capacity: number;
   organizerId: string;
   createdAt: string;

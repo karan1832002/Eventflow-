@@ -4,6 +4,7 @@ import { adminDb } from "@/lib/firebaseAdmin";
 export async function GET() {
   try {
     const snap = await adminDb.collection("events").orderBy("date", "asc").get();
+
     const events = snap.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
@@ -21,21 +22,36 @@ export async function GET() {
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { title, location, date, price, description } = body;
 
-    if (!title || !location || !date) {
+    const {
+      title,
+      category,
+      location,
+      date,
+      time,
+      price,
+      description,
+      capacity,
+      bookedSeats,
+    } = body;
+
+    if (!title || !category || !location || !date) {
       return NextResponse.json(
-        { error: "title, location and date are required" },
+        { error: "title, category, location and date are required" },
         { status: 400 }
       );
     }
 
     const docRef = await adminDb.collection("events").add({
       title,
+      category,
       location,
       date,
-      price: price || 0,
+      time: time || "",
+      price: Number(price) || 0,
       description: description || "",
+      capacity: Number(capacity) || 50,
+      bookedSeats: bookedSeats || [],
       createdAt: new Date().toISOString(),
     });
 
