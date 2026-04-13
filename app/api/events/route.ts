@@ -1,24 +1,14 @@
-/**
- * app/api/events/route.ts
- * 
- * Main API route for managing events.
- * Supports fetching all events and creating new ones.
- */
+// API route for events - supports GET (fetch all) and POST (create new)
 
 import { NextResponse } from "next/server";
 import { adminDb } from "@/lib/firebaseAdmin";
 
-/**
- * GET Handler
- * 
- * Fetches all events from Firestore, ordered by date.
- * 
- * @returns {Promise<NextResponse>} JSON response with an array of events or an error.
- */
+// GET: returns all events from the database, sorted by date
 export async function GET() {
   try {
     const snap = await adminDb.collection("events").orderBy("date", "asc").get();
 
+    // Convert each document into a plain object with its ID
     const events = snap.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
@@ -33,14 +23,7 @@ export async function GET() {
   }
 }
 
-/**
- * POST Handler
- * 
- * Creates a new event entry in Firestore.
- * 
- * @param {Request} req - The standard Next.js request object.
- * @returns {Promise<NextResponse>} JSON response with the new event ID or an error.
- */
+// POST: creates a new event using the data sent in the request body
 export async function POST(req: Request) {
   try {
     const body = await req.json();
@@ -57,7 +40,7 @@ export async function POST(req: Request) {
       bookedSeats,
     } = body;
 
-    // Validate required fields for event creation
+    // Make sure the required fields are present before saving
     if (!title || !category || !location || !date) {
       return NextResponse.json(
         { error: "title, category, location and date are required" },
@@ -65,7 +48,7 @@ export async function POST(req: Request) {
       );
     }
 
-    // Add new event document to Firestore
+    // Save the new event to the database
     const docRef = await adminDb.collection("events").add({
       title,
       category,

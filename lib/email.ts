@@ -1,24 +1,10 @@
-/**
- * lib/email.ts
- * 
- * Contains email notification logic using the Resend service.
- * Handles sending payment links and booking confirmations to users.
- */
+// Email helper - sends booking confirmation and payment link emails via Resend
 
 import { Resend } from "resend";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-/**
- * Sends a payment link email to a user after they have requested a booking.
- * 
- * @param {Object} params - The booking details.
- * @param {string} params.name - The attendee's name.
- * @param {string} params.email - The attendee's email address.
- * @param {string[]} params.seats - List of seat identifiers being booked.
- * @param {string} params.bookingId - The unique ID of the pending booking.
- * @returns {Promise<void>}
- */
+// Emails the user a link to pay for their booked seats
 export async function sendPaymentLinkEmail({
   name,
   email,
@@ -49,4 +35,4 @@ export async function sendPaymentLinkEmail({
       <p><a href="${paymentLink}">Pay with Stripe</a></p>
     `,
   });
-}
+}

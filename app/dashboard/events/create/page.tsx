@@ -1,9 +1,4 @@
-/**
- * app/dashboard/events/create/page.tsx
- * 
- * The page for creating a new event by an organizer.
- * Provides a form to input event details and submits them to the events API.
- */
+// Create Event page - lets an admin fill in a form to add a new event
 
 "use client";
 
@@ -11,11 +6,6 @@ import { useEffect, useState } from "react";
 import { observeAuth } from "@/lib/auth";
 import { useRouter } from "next/navigation";
 
-/**
- * CreateEventPage Component
- * 
- * Renders the event creation form and handles authentication checks.
- */
 export default function CreateEventPage() {
   const router = useRouter();
   const [title, setTitle] = useState("");
@@ -27,9 +17,7 @@ export default function CreateEventPage() {
   const [description, setDescription] = useState("");
   const [loading, setLoading] = useState(false);
 
-  /**
-   * Monitor auth state; redirect to login if not authenticated.
-   */
+  // Redirect to login if the user is not signed in
   useEffect(() => {
     const unsub = observeAuth((user) => {
       if (!user) router.push("/login");
@@ -37,11 +25,7 @@ export default function CreateEventPage() {
     return () => unsub();
   }, [router]);
 
-  /**
-   * Handles form submission to create a new event.
-   * 
-   * @param {React.FormEvent} e - The form event.
-   */
+  // Runs when the form is submitted - sends event data to the API
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -58,13 +42,13 @@ export default function CreateEventPage() {
           time,
           price: Number(price),
           description,
-          bookedSeats: [], // Initialize with no bookings
+          bookedSeats: [], // Start with no seats booked
         }),
       });
 
       if (!res.ok) throw new Error("Failed to create event");
 
-      // Reset form fields on success
+      // Clear the form after a successful save
       setTitle("");
       setCategory("");
       setLocation("");
@@ -73,7 +57,7 @@ export default function CreateEventPage() {
       setPrice("");
       setDescription("");
       alert("Event created successfully");
-      router.push("/dashboard"); // Redirect back to dashboard
+      router.push("/dashboard"); // Go back to the dashboard
     } catch (err) {
       alert("Something went wrong");
     } finally {
@@ -84,7 +68,7 @@ export default function CreateEventPage() {
   return (
     <main className="mx-auto max-w-3xl px-6 py-10">
       <div className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
-        {/* Page Header */}
+        {/* Page title */}
         <div className="mb-8">
           <p className="text-sm font-semibold uppercase tracking-wide text-indigo-600">
             Admin Panel
@@ -97,7 +81,7 @@ export default function CreateEventPage() {
           </p>
         </div>
 
-        {/* Creation Form */}
+        {/* Event creation form */}
         <form onSubmit={handleSubmit} className="space-y-5">
           <input
             className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
@@ -183,4 +167,4 @@ export default function CreateEventPage() {
       </div>
     </main>
   );
-}
+}

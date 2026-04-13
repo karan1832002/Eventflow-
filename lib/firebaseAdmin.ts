@@ -1,9 +1,4 @@
-/**
- * lib/firebaseAdmin.ts
- * 
- * Initializes the Firebase Admin SDK for server-side operations.
- * This is used in API routes to interact with Firestore and Auth with elevated privileges.
- */
+// Sets up the Firebase Admin SDK for use in server-side API routes
 
 import { cert, getApp, getApps, initializeApp } from "firebase-admin/app";
 import { getAuth } from "firebase-admin/auth";
@@ -13,14 +8,14 @@ const projectId = process.env.FIREBASE_PROJECT_ID;
 const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
 const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n");
 
-// Ensure required environment variables are present
+// Stop the app from starting if the Firebase credentials are missing
 if (!projectId || !clientEmail || !privateKey) {
   throw new Error(
     "Missing Firebase Admin environment variables: FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY"
   );
 }
 
-// Initialize Admin App (Singleton pattern to prevent re-initialization)
+// Only create the app once - reuse the existing instance if it already exists
 const adminApp = getApps().length
   ? getApp()
   : initializeApp({
@@ -31,8 +26,6 @@ const adminApp = getApps().length
       }),
     });
 
-/**
- * Exported Firestore and Auth instances for use in server-side logic.
- */
+// Export database and auth instances for use in API routes
 export const adminDb = getFirestore(adminApp);
 export const adminAuth = getAuth(adminApp);
