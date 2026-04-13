@@ -1,3 +1,11 @@
+/**
+ * app/dashboard/page.tsx
+ * 
+ * The main organizer dashboard page.
+ * Displays a summary of total events and bookings, and lists all events managed by the organizer.
+ * Provides functionality to delete events and links to edit or create new ones.
+ */
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -8,6 +16,9 @@ import { collection, deleteDoc, doc, getDocs, orderBy, query } from "firebase/fi
 import { db } from "@/lib/firebaseClient";
 import { Calendar, Clock, MapPin, Plus, Trash2, Edit, Ticket } from "lucide-react";
 
+/**
+ * Interface for an event item as stored in Firestore and used in the dashboard.
+ */
 type EventItem = {
   id: string;
   title: string;
@@ -20,12 +31,20 @@ type EventItem = {
   bookedSeats?: string[];
 };
 
+/**
+ * DashboardPage Component
+ * 
+ * Handles authentication checks (admin only) and displays event management tools.
+ */
 export default function DashboardPage() {
   const router = useRouter();
   const [events, setEvents] = useState<EventItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState("");
 
+  /**
+   * Fetches the list of events from Firestore, ordered by date.
+   */
   const loadEvents = async () => {
     const q = query(collection(db, "events"), orderBy("date", "asc"));
     const snap = await getDocs(q);
@@ -38,17 +57,21 @@ export default function DashboardPage() {
     setEvents(data);
   };
 
+  /**
+   * Effect to handle authentication and role validation.
+   * Redirects non-admins to the events page.
+   */
   useEffect(() => {
     const unsub = observeAuth(async (user) => {
       if (!user) {
-        router.push("/login");
+        router.push("/login"); // Redirect to login if not authenticated
         return;
       }
 
       const role = await getUserRole(user.uid);
 
       if (role !== "admin") {
-        router.push("/events");
+        router.push("/events"); // Redirect non-admins
         return;
       }
 
@@ -59,6 +82,11 @@ export default function DashboardPage() {
     return () => unsub();
   }, [router]);
 
+  /**
+   * Handles event deletion with a confirmation prompt.
+   * 
+   * @param {string} id - The ID of the event to delete.
+   */
   const handleDelete = async (id: string) => {
     if (
       !window.confirm(
@@ -71,6 +99,7 @@ export default function DashboardPage() {
     try {
       setDeletingId(id);
       await deleteDoc(doc(db, "events", id));
+      // Locally update state to remove the deleted event
       setEvents((prev) => prev.filter((event) => event.id !== id));
     } catch (error) {
       console.error(error);
@@ -80,12 +109,14 @@ export default function DashboardPage() {
     }
   };
 
+  // Derived metrics for the dashboard
   const totalEvents = events.length;
   const totalBookings = events.reduce(
     (sum, event) => sum + (event.bookedSeats?.length || 0),
     0
   );
 
+  // Loading state view
   if (loading) {
     return (
       <main className="mx-auto flex h-[50vh] max-w-7xl items-center justify-center px-6 py-12">
@@ -96,6 +127,7 @@ export default function DashboardPage() {
 
   return (
     <main className="mx-auto max-w-7xl px-6 py-12">
+      {/* Header Section */}
       <div className="mb-10 flex flex-col justify-between gap-6 border-b border-slate-200 pb-8 md:flex-row md:items-end">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-slate-900">
@@ -115,6 +147,7 @@ export default function DashboardPage() {
         </Link>
       </div>
 
+      {/* Stats Overview */}
       <div className="mb-10 grid grid-cols-1 gap-6 sm:grid-cols-2">
         <div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
           <p className="text-sm font-semibold text-slate-500">Total Events</p>
@@ -131,7 +164,9 @@ export default function DashboardPage() {
         </div>
       </div>
 
+      {/* Events List */}
       {events.length === 0 ? (
+        // Empty State View
         <div className="rounded-3xl border border-dashed border-slate-300 bg-slate-50 p-16 text-center shadow-[0_8px_30px_rgb(0,0,0,0.02)]">
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full border border-slate-200 bg-white">
             <Calendar className="h-8 w-8 text-slate-400" />
@@ -148,6 +183,7 @@ export default function DashboardPage() {
           </Link>
         </div>
       ) : (
+        // Grid of Event Items
         <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
           {events.map((event) => (
             <div
@@ -220,4 +256,4 @@ export default function DashboardPage() {
       )}
     </main>
   );
-}
+}

@@ -1,3 +1,11 @@
+/**
+ * components/BookingForm.tsx
+ * 
+ * An interactive seat selection and booking form. 
+ * Allows users to pick available seats, provide contact details, and submit a booking request.
+ * Real-time seat updates are handled via Firebase onSnapshot.
+ */
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -5,9 +13,16 @@ import { doc, onSnapshot } from "firebase/firestore";
 import { db } from "@/lib/firebaseClient";
 import { Armchair, CheckCircle2 } from "lucide-react";
 
+// Predefined seat layout
 const ROWS = ["A", "B", "C"];
 const COLS = [1, 2, 3, 4];
 
+/**
+ * BookingForm Component
+ * 
+ * @param {Object} props - Component props.
+ * @param {string} props.eventId - Unique ID of the event for which seats are being booked.
+ */
 export default function BookingForm({ eventId }: { eventId: string }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -16,6 +31,9 @@ export default function BookingForm({ eventId }: { eventId: string }) {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
+  /**
+   * Listen for real-time changes to the event document to keep seat availability updated.
+   */
   useEffect(() => {
     const unsub = onSnapshot(doc(db, "events", eventId), (snap) => {
       if (snap.exists()) {
@@ -25,13 +43,23 @@ export default function BookingForm({ eventId }: { eventId: string }) {
     return () => unsub();
   }, [eventId]);
 
+  /**
+   * Selection logic for seats.
+   * 
+   * @param {string} seat - The seat identifier (e.g., 'A1').
+   */
   const toggleSeat = (seat: string) => {
-    if (bookedSeats.includes(seat)) return;
+    if (bookedSeats.includes(seat)) return; // Don't allow selecting already booked seats
     setSelectedSeats((prev) =>
       prev.includes(seat) ? prev.filter((s) => s !== seat) : [...prev, seat]
     );
   };
 
+  /**
+   * Submits the booking request to the API.
+   * 
+   * @param {React.FormEvent} e - Form submission event.
+   */
   const handleBooking = async (e: React.FormEvent) => {
     e.preventDefault();
     if (selectedSeats.length === 0) {
@@ -61,6 +89,7 @@ export default function BookingForm({ eventId }: { eventId: string }) {
     }
   };
 
+  // Render a success message upon completion
   if (success) {
     return (
       <div className="flex flex-col items-center justify-center py-10 px-4 text-center space-y-4 animate-in fade-in duration-500">
@@ -83,7 +112,7 @@ export default function BookingForm({ eventId }: { eventId: string }) {
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
-      {/* Legend */}
+      {/* Legend for seat colors */}
       <div className="flex justify-center gap-6 text-sm font-medium text-slate-600 mt-2">
         <div className="flex items-center gap-2">
           <span className="w-3 h-3 rounded-full bg-slate-50 ring-1 ring-inset ring-slate-200"></span> Available
@@ -96,12 +125,12 @@ export default function BookingForm({ eventId }: { eventId: string }) {
         </div>
       </div>
 
-      {/* Screen Mock */}
+      {/* Screen/Stage Visual Indicator */}
       <div className="relative pt-6 mt-4 rounded-t-[100%] border-t-4 border-indigo-100 mx-8">
         <span className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-4 bg-white px-4 text-[10px] font-bold tracking-[0.2em] text-slate-400">STAGE</span>
       </div>
 
-      {/* Seat Grid */}
+      {/* Interactive Seat Grid */}
       <div className="flex flex-col items-center gap-4 mt-8">
         {ROWS.map((row) => (
           <div key={row} className="flex gap-4">
@@ -135,6 +164,7 @@ export default function BookingForm({ eventId }: { eventId: string }) {
         ))}
       </div>
 
+      {/* User Information Form */}
       <div className="pt-8 mt-8 border-t border-slate-100">
         <form onSubmit={handleBooking} className="space-y-5">
           <div>
@@ -171,4 +201,4 @@ export default function BookingForm({ eventId }: { eventId: string }) {
       </div>
     </div>
   );
-}
+}

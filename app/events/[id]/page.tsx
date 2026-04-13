@@ -1,8 +1,19 @@
+/**
+ * app/events/[id]/page.tsx
+ * 
+ * Public event details page.
+ * Displays comprehensive information about a specific event, including a description,
+ * date, time, location map, and a booking form for seat selection.
+ */
+
 import { adminDb } from "@/lib/firebaseAdmin";
 import BookingForm from "@/components/BookingForm";
 import EventMap from "@/components/EventMap";
 import { Calendar, Clock, MapPin, Tag } from "lucide-react";
 
+/**
+ * Event type definition for this page.
+ */
 type Event = {
   id: string;
   title: string;
@@ -14,6 +25,14 @@ type Event = {
   price?: number;
 };
 
+/**
+ * EventDetailsPage Component (Server Component)
+ * 
+ * Fetches event data based on the dynamic ID parameter and renders the details view.
+ * 
+ * @param {Object} props - Component props.
+ * @param {Promise} props.params - Dynamic route parameters.
+ */
 export default async function EventDetailsPage({
   params,
 }: {
@@ -21,8 +40,10 @@ export default async function EventDetailsPage({
 }) {
   const { id } = await params;
 
+  // Fetch event document from Firestore using Admin SDK
   const doc = await adminDb.collection("events").doc(id).get();
 
+  // Handle case where event does not exist
   if (!doc.exists) {
     return (
       <div className="min-h-[50vh] flex items-center justify-center">
@@ -43,6 +64,7 @@ export default async function EventDetailsPage({
     throw new Error("Event data is missing");
   }
 
+  // Cast Firestore data to the Event type
   const event: Event = {
     id: doc.id,
     title: data.title,
@@ -57,9 +79,10 @@ export default async function EventDetailsPage({
   return (
     <main className="mx-auto max-w-7xl px-6 py-12">
       <div className="grid gap-12 lg:grid-cols-[1fr_420px]">
-        {/* Left Column - Details */}
+        {/* Left Column - Detailed Information */}
         <div className="space-y-10">
           <div>
+            {/* Category Tag */}
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 text-sm font-semibold mb-5">
               <Tag size={14} />
               {event.category || "General Event"}
@@ -74,6 +97,7 @@ export default async function EventDetailsPage({
             </p>
           </div>
 
+          {/* Event Metadata Grid (Date, Time, Location) */}
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-6 py-8 border-y border-slate-100">
             <div className="flex flex-col gap-3 text-slate-700">
               <div className="p-3 bg-indigo-50 rounded-2xl w-max border border-indigo-100 text-indigo-600">
@@ -110,12 +134,13 @@ export default async function EventDetailsPage({
             </div>
           </div>
 
+          {/* Interactive Map Section */}
           <div className="sticky top-28 bg-white rounded-[2rem] p-8 shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-slate-100">
             <EventMap location={event.location} />
           </div>
         </div>
 
-        {/* Right Column - Booking */}
+        {/* Right Column - Booking Interface */}
         <div className="relative">
           <div className="sticky top-28 bg-white rounded-[2rem] p-8 shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-slate-100">
             <div className="flex justify-between items-end mb-8 border-b border-slate-100 pb-6">
@@ -141,10 +166,11 @@ export default async function EventDetailsPage({
               </div>
             </div>
 
+            {/* Client-side booking component */}
             <BookingForm eventId={event.id} />
           </div>
         </div>
       </div>
     </main>
   );
-}
+}

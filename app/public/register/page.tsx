@@ -1,3 +1,10 @@
+/**
+ * app/public/register/page.tsx
+ * 
+ * An alternate/legacy public registration page.
+ * Handles account creation and user profile initialization in Firestore.
+ */
+
 "use client";
 
 import Navbar from "@/components/Navbar";
@@ -7,6 +14,11 @@ import { doc, setDoc } from "firebase/firestore";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+/**
+ * RegisterPage Component
+ * 
+ * Manages the registration form and account creation flow.
+ */
 export default function RegisterPage() {
   const [name, setName] = useState("");
   const [role, setRole] = useState("attendee");
@@ -14,16 +26,28 @@ export default function RegisterPage() {
   const [password, setPassword] = useState("");
   const router = useRouter();
 
+  /**
+   * Handles user registration.
+   * Creates a Firebase user and a corresponding Firestore user document.
+   * 
+   * @param {React.FormEvent} e - The form submission event.
+   */
   const register = async (e: any) => {
     e.preventDefault();
-    const cred = await createUserWithEmailAndPassword(auth, email, password);
-    await setDoc(doc(db, "users", cred.user.uid), {
-      name,
-      email,
-      role,
-      createdAt: new Date().toISOString(),
-    });
-    router.push("/");
+    try {
+      const cred = await createUserWithEmailAndPassword(auth, email, password);
+      // Create user profile in Firestore
+      await setDoc(doc(db, "users", cred.user.uid), {
+        name,
+        email,
+        role,
+        createdAt: new Date().toISOString(),
+      });
+      // Redirect to home after registration
+      router.push("/");
+    } catch (err) {
+      console.error("Registration failed", err);
+    }
   };
 
   return (
@@ -32,14 +56,32 @@ export default function RegisterPage() {
       <main className="max-w-md mx-auto p-6">
         <h1 className="text-xl font-bold mb-4">Register</h1>
         <form className="flex flex-col gap-3" onSubmit={register}>
-          <input className="border p-2" placeholder="Name" onChange={(e) => setName(e.target.value)} />
-          <select className="border p-2" onChange={(e) => setRole(e.target.value)}>
+          <input 
+            className="border p-2" 
+            placeholder="Name" 
+            onChange={(e) => setName(e.target.value)} 
+          />
+          <select 
+            className="border p-2" 
+            onChange={(e) => setRole(e.target.value)}
+          >
             <option value="attendee">Attendee</option>
             <option value="organizer">Organizer</option>
           </select>
-          <input className="border p-2" placeholder="Email" onChange={(e) => setEmail(e.target.value)} />
-          <input className="border p-2" placeholder="Password" type="password" onChange={(e) => setPassword(e.target.value)} />
-          <button className="bg-blue-600 text-white p-2 rounded">Sign up</button>
+          <input 
+            className="border p-2" 
+            placeholder="Email" 
+            onChange={(e) => setEmail(e.target.value)} 
+          />
+          <input 
+            className="border p-2" 
+            placeholder="Password" 
+            type="password" 
+            onChange={(e) => setPassword(e.target.value)} 
+          />
+          <button className="bg-blue-600 text-white p-2 rounded">
+            Sign up
+          </button>
         </form>
       </main>
     </>

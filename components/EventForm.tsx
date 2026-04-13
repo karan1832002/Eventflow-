@@ -1,10 +1,22 @@
+/**
+ * components/EventForm.tsx
+ * 
+ * a centralized form component for creating and editing events.
+ * Handles validation, state management for event fields, and category selection.
+ */
+
 "use client";
 
 import { useState } from "react";
 import { EVENT_CATEGORIES } from "@/data/categories";
 
+/**
+ * Props for the EventForm component.
+ */
 type EventFormProps = {
+  /** Optional initial data for editing an existing event. */
   initial?: any;
+  /** Callback function to handle form submission. */
   onSubmit: (data: {
     title: string;
     category: string;
@@ -17,6 +29,11 @@ type EventFormProps = {
   }) => void;
 };
 
+/**
+ * EventForm Component
+ * 
+ * Renders a form to capture event details such as title, category, location, and pricing.
+ */
 export default function EventForm({
   initial = {},
   onSubmit,
@@ -53,6 +70,7 @@ export default function EventForm({
         }}
       >
         <div className="space-y-4">
+          {/* Title Input */}
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-1.5">
               Event Title
@@ -66,6 +84,7 @@ export default function EventForm({
             />
           </div>
 
+          {/* Category Selection */}
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-1.5">
               Category
@@ -85,6 +104,7 @@ export default function EventForm({
             </select>
           </div>
 
+          {/* Description Textarea */}
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-1.5">
               Description
@@ -97,6 +117,7 @@ export default function EventForm({
             />
           </div>
 
+          {/* Date and Time Fields */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-semibold text-slate-700 mb-1.5">
@@ -124,6 +145,7 @@ export default function EventForm({
             </div>
           </div>
 
+          {/* Location Input */}
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-1.5">
               Location
@@ -137,6 +159,7 @@ export default function EventForm({
             />
           </div>
 
+          {/* Pricing and Capacity Fields */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-semibold text-slate-700 mb-1.5">
@@ -177,4 +200,4 @@ export default function EventForm({
       </form>
     </div>
   );
-}
+}

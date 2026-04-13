@@ -1,3 +1,11 @@
+/**
+ * app/profile/page.tsx
+ * 
+ * The user profile page.
+ * Displays the authenticated user's email and a list of their bookings.
+ * Fetches booking data and corresponding event details from Firestore.
+ */
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -8,6 +16,9 @@ import { db } from "@/lib/firebaseClient";
 import Link from "next/link";
 import { Calendar, MapPin, Ticket } from "lucide-react";
 
+/**
+ * Interface for a booking record.
+ */
 type Booking = {
   id: string;
   eventId: string;
@@ -15,6 +26,9 @@ type Booking = {
   createdAt: string;
 };
 
+/**
+ * Interface for a summary of an event associated with a booking.
+ */
 type EventItem = {
   id: string;
   title: string;
@@ -22,14 +36,23 @@ type EventItem = {
   location: string;
 };
 
+/**
+ * ProfilePage Component
+ * 
+ * Manages user authentication state and fetches their personal booking history.
+ */
 export default function ProfilePage() {
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
   const [bookings, setBookings] = useState<(Booking & { event?: EventItem })[]>([]);
   const [loading, setLoading] = useState(true);
 
+  /**
+   * Fetches user bookings and related event info on mount.
+   */
   useEffect(() => {
     const unsub = observeAuth(async (u) => {
+      // Redirect to login if not authenticated
       if (!u) {
         router.push("/login");
         return;
@@ -37,7 +60,7 @@ export default function ProfilePage() {
       setUser(u);
       
       try {
-        // Find bookings for this user's email
+        // Query bookings for this user's email
         const qBookings = query(collection(db, "bookings"), where("email", "==", u.email));
         const snapBookings = await getDocs(qBookings);
         
@@ -46,21 +69,24 @@ export default function ProfilePage() {
           ...doc.data()
         })) as Booking[];
 
+        // Handle case with no bookings
         if (userBookings.length === 0) {
           setBookings([]);
           setLoading(false);
           return;
         }
 
-        // Fetch corresponding events
+        // Fetch corresponding events for the bookings
         const eventIds = Array.from(new Set(userBookings.map(b => b.eventId)));
-        const qEvents = query(collection(db, "events"), where(documentId(), "in", eventIds.slice(0, 10))); // Simple in query up to 10
+        const qEvents = query(collection(db, "events"), where(documentId(), "in", eventIds.slice(0, 10))); // Limit to 10 for simplicity
         const snapEvents = await getDocs(qEvents);
+        
         const eventsMap = new Map();
         snapEvents.forEach(doc => {
           eventsMap.set(doc.id, { id: doc.id, ...doc.data() });
         });
 
+        // Merge booking data with event info
         const merged = userBookings.map(b => ({
           ...b,
           event: eventsMap.get(b.eventId)
@@ -77,6 +103,7 @@ export default function ProfilePage() {
     return () => unsub();
   }, [router]);
 
+  // Loading state view
   if (loading) {
     return (
       <main className="mx-auto max-w-5xl px-6 py-12 flex justify-center items-center min-h-[40vh]">
@@ -87,6 +114,7 @@ export default function ProfilePage() {
 
   return (
     <main className="mx-auto max-w-5xl px-6 py-12">
+      {/* Profile Header */}
       <div className="mb-10 pb-8 border-b border-slate-200">
         <h1 className="text-3xl font-bold text-slate-900 tracking-tight">My Profile</h1>
         <p className="mt-2 text-slate-600">Logged in as <span className="font-medium text-slate-900">{user?.email}</span></p>
@@ -94,7 +122,9 @@ export default function ProfilePage() {
 
       <h2 className="text-2xl font-bold text-slate-900 mb-6">My Bookings</h2>
 
+      {/* Bookings List */}
       {bookings.length === 0 ? (
+        // Empty State: No Bookings
         <div className="rounded-[2rem] border border-dashed border-slate-300 bg-slate-50 p-16 text-center">
           <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 border border-slate-200 shadow-sm">
             <Ticket className="w-8 h-8 text-slate-400" />
@@ -109,6 +139,7 @@ export default function ProfilePage() {
           </Link>
         </div>
       ) : (
+        // Display bookmarked/reserved events
         <div className="space-y-4">
           {bookings.map((booking) => (
             <div key={booking.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 bg-white p-6 rounded-3xl border border-slate-200 shadow-[0_8px_30px_rgb(0,0,0,0.02)]">
@@ -128,6 +159,7 @@ export default function ProfilePage() {
                 </div>
               </div>
 
+              {/* Reserved Seats display */}
               <div className="flex items-center gap-4 sm:border-l sm:border-slate-100 sm:pl-6">
                 <div className="text-left sm:text-right">
                   <p className="text-sm font-medium text-slate-500 mb-1">Seats Reserved</p>
@@ -147,3 +179,4 @@ export default function ProfilePage() {
     </main>
   );
 }
+

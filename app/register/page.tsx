@@ -1,9 +1,22 @@
+/**
+ * app/register/page.tsx
+ * 
+ * The user registration page.
+ * Allows new users to create an account using email and password.
+ * Newly registered users are assigned a default 'user' role via the registration helper.
+ */
+
 "use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { registerUser } from "@/lib/auth";
 
+/**
+ * RegisterPage Component
+ * 
+ * Renders the registration form and manages account creation state.
+ */
 export default function RegisterPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
@@ -11,15 +24,23 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  /**
+   * Handles the registration form submission.
+   * 
+   * @param {React.FormEvent} e - The form submission event.
+   */
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
 
     try {
+      // Call auth helper to create user and set role
       await registerUser(email, password);
+      // Redirect to events page on success
       router.push("/events");
     } catch (err: any) {
+      // Capture and display registration errors
       setError(err.message || "Registration failed");
     } finally {
       setLoading(false);
@@ -29,11 +50,13 @@ export default function RegisterPage() {
   return (
     <div className="flex min-h-[80vh] items-center justify-center px-6 py-12">
       <div className="w-full max-w-md bg-white rounded-[2rem] p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100">
+        {/* Header Section */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Create an account</h1>
           <p className="text-slate-500 mt-2">Sign up to book seats and explore exclusive events.</p>
         </div>
 
+        {/* Registration Form */}
         <form onSubmit={handleRegister} className="space-y-5">
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-1.5">Email Address</label>
@@ -59,6 +82,7 @@ export default function RegisterPage() {
             />
           </div>
 
+          {/* Error Message Display */}
           {error && <p className="text-sm font-medium text-red-500">{error}</p>}
 
           <button
@@ -70,10 +94,11 @@ export default function RegisterPage() {
           </button>
         </form>
 
+        {/* Navigation Link to Login */}
         <p className="text-center text-sm text-slate-500 mt-6">
           Already have an account? <a href="/login" className="font-bold text-indigo-600 hover:text-indigo-500">Log in</a>
         </p>
       </div>
     </div>
   );
-}
+}

@@ -1,10 +1,22 @@
+/**
+ * app/dashboard/events/create/page.tsx
+ * 
+ * The page for creating a new event by an organizer.
+ * Provides a form to input event details and submits them to the events API.
+ */
+
 "use client";
 
 import { useEffect, useState } from "react";
 import { observeAuth } from "@/lib/auth";
 import { useRouter } from "next/navigation";
 
-export default function DashboardPage() {
+/**
+ * CreateEventPage Component
+ * 
+ * Renders the event creation form and handles authentication checks.
+ */
+export default function CreateEventPage() {
   const router = useRouter();
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState("");
@@ -15,6 +27,9 @@ export default function DashboardPage() {
   const [description, setDescription] = useState("");
   const [loading, setLoading] = useState(false);
 
+  /**
+   * Monitor auth state; redirect to login if not authenticated.
+   */
   useEffect(() => {
     const unsub = observeAuth((user) => {
       if (!user) router.push("/login");
@@ -22,6 +37,11 @@ export default function DashboardPage() {
     return () => unsub();
   }, [router]);
 
+  /**
+   * Handles form submission to create a new event.
+   * 
+   * @param {React.FormEvent} e - The form event.
+   */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -38,12 +58,13 @@ export default function DashboardPage() {
           time,
           price: Number(price),
           description,
-          bookedSeats: [],
+          bookedSeats: [], // Initialize with no bookings
         }),
       });
 
       if (!res.ok) throw new Error("Failed to create event");
 
+      // Reset form fields on success
       setTitle("");
       setCategory("");
       setLocation("");
@@ -52,6 +73,7 @@ export default function DashboardPage() {
       setPrice("");
       setDescription("");
       alert("Event created successfully");
+      router.push("/dashboard"); // Redirect back to dashboard
     } catch (err) {
       alert("Something went wrong");
     } finally {
@@ -62,6 +84,7 @@ export default function DashboardPage() {
   return (
     <main className="mx-auto max-w-3xl px-6 py-10">
       <div className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
+        {/* Page Header */}
         <div className="mb-8">
           <p className="text-sm font-semibold uppercase tracking-wide text-indigo-600">
             Admin Panel
@@ -74,6 +97,7 @@ export default function DashboardPage() {
           </p>
         </div>
 
+        {/* Creation Form */}
         <form onSubmit={handleSubmit} className="space-y-5">
           <input
             className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
@@ -159,4 +183,4 @@ export default function DashboardPage() {
       </div>
     </main>
   );
-}
+}

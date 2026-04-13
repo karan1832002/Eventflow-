@@ -1,7 +1,19 @@
+/**
+ * app/public/page.tsx
+ * 
+ * An alternate/legacy public home page.
+ * Displays a list of upcoming events fetched from Firestore.
+ */
+
 import Navbar from "@/components/Navbar";
 import EventCard from "@/components/EventsCard";
 import { adminDb } from "@/lib/firebaseAdmin";
 
+/**
+ * HomePage Component (Server Component)
+ * 
+ * Fetches and displays a grid of events.
+ */
 export default async function HomePage() {
   const snap = await adminDb.collection("events").get();
   const events = snap.docs.map((d) => ({ id: d.id, ...(d.data() as any) }));

@@ -1,6 +1,19 @@
+/**
+ * components/EventsCard.tsx
+ * 
+ * A visually appealing card component that displays a summary of an event.
+ * Includes title, description, date, time, and location with icons.
+ */
+
 import Link from "next/link";
 import { Calendar, Clock, MapPin } from "lucide-react";
 
+/**
+ * EventCard Component
+ * 
+ * @param {Object} props - Component props.
+ * @param {any} props.event - The event data object to display.
+ */
 export default function EventCard({ event }: { event: any }) {
   return (
     <div className="group flex flex-col bg-white rounded-3xl border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)]">
@@ -17,10 +30,12 @@ export default function EventCard({ event }: { event: any }) {
       </div>
 
       <div className="p-6 flex flex-col flex-1 bg-white">
+        {/* Shortened description */}
         <p className="text-sm text-slate-500 line-clamp-2 mb-6 flex-1 leading-relaxed">
           {event.description}
         </p>
 
+        {/* Event Meta Data */}
         <div className="space-y-2.5 text-sm text-slate-600 mb-6 font-medium">
           <div className="flex items-center gap-2.5">
             <Calendar className="w-4 h-4 text-indigo-500" />
@@ -38,6 +53,7 @@ export default function EventCard({ event }: { event: any }) {
           </div>
         </div>
 
+        {/* Action Link */}
         <Link
           href={`/events/${event.id}`}
           className="inline-flex w-full mt-2 items-center justify-center rounded-xl bg-indigo-600 px-4 py-3 text-sm font-semibold !text-white shadow hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 transition-all duration-200"
@@ -47,4 +63,4 @@ export default function EventCard({ event }: { event: any }) {
       </div>
     </div>
   );
-}
+}

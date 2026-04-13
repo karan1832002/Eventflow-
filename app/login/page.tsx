@@ -1,9 +1,21 @@
+/**
+ * app/login/page.tsx
+ * 
+ * The authentication login page.
+ * Handles user sign-in via email and password using Firebase Authentication.
+ */
+
 "use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { loginUser } from "@/lib/auth";
 
+/**
+ * LoginPage Component
+ * 
+ * Renders the login form and manages authentication state (loading, error).
+ */
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
@@ -11,15 +23,23 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  /**
+   * Handles the login form submission.
+   * 
+   * @param {React.FormEvent} e - The form submission event.
+   */
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
 
     try {
+      // Call auth helper to sign in
       await loginUser(email, password);
+      // Redirect to the events page on success
       router.push("/events");
     } catch (err: any) {
+      // Capture and display auth errors
       setError(err.message || "Login failed");
     } finally {
       setLoading(false);
@@ -29,11 +49,13 @@ export default function LoginPage() {
   return (
     <div className="flex min-h-[80vh] items-center justify-center px-6 py-12">
       <div className="w-full max-w-md bg-white rounded-[2rem] p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100">
+        {/* Header Section */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Welcome back</h1>
           <p className="text-slate-500 mt-2">Enter your credentials to access your account.</p>
         </div>
 
+        {/* Login Form */}
         <form onSubmit={handleLogin} className="space-y-5">
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-1.5">Email Address</label>
@@ -59,6 +81,7 @@ export default function LoginPage() {
             />
           </div>
 
+          {/* Error Message Display */}
           {error && <p className="text-sm font-medium text-red-500">{error}</p>}
 
           <button
@@ -70,10 +93,11 @@ export default function LoginPage() {
           </button>
         </form>
         
+        {/* Navigation Link to Registration */}
         <p className="text-center text-sm text-slate-500 mt-6">
           Don't have an account? <a href="/register" className="font-bold text-indigo-600 hover:text-indigo-500">Sign up</a>
         </p>
       </div>
     </div>
   );
-}
+}

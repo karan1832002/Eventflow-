@@ -1,3 +1,10 @@
+/**
+ * lib/firebaseClient.ts
+ * 
+ * Initializes the Firebase Client SDK for browser-side usage.
+ * Exports the authenticated auth and firestore instances for use in components.
+ */
+
 import { getApp, getApps, initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
@@ -11,6 +18,7 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID!,
 };
 
+// Initialize App (Singleton pattern to prevent re-initialization during HMR)
 const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
 
 export const auth = getAuth(app);

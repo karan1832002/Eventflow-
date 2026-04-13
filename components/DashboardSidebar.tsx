@@ -1,5 +1,17 @@
+/**
+ * components/DashboardSidebar.tsx
+ * 
+ * A navigation sidebar for the organizer dashboard.
+ * Provides links to manage events and create new registrations.
+ */
+
 import Link from "next/link";
 
+/**
+ * DashboardSidebar Component
+ * 
+ * Renders the sidebar navigation for the /dashboard route.
+ */
 export default function DashboardSidebar() {
   return (
     <aside className="w-64 border-r border-slate-200 p-6">

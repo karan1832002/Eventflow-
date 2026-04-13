@@ -1,8 +1,18 @@
+/**
+ * app/public/events/[id]/page.tsx
+ * 
+ * An alternate/legacy dynamic page for viewing detailed event information.
+ * Fetches specific event data and renders its description, metadata, and map.
+ */
+
 import Navbar from "@/components/Navbar";
 import BookingButton from "@/components/BookingButton";
 import { adminDb } from "@/lib/firebaseAdmin";
 import EventMap from "@/components/EventMap";
 
+/**
+ * Event interface for the component state.
+ */
 type Event = {
   id: string;
   title: string;
@@ -12,6 +22,14 @@ type Event = {
   location: string;
 };
 
+/**
+ * EventDetails Component (Server Component)
+ * 
+ * Fetches a single event by ID and displays its interactive details.
+ * 
+ * @param {Object} props - Component props.
+ * @param {Object} props.params - Route parameters containing the event ID.
+ */
 export default async function EventDetails({
   params,
 }: {
@@ -19,6 +37,7 @@ export default async function EventDetails({
 }) {
   const id = params.id;
 
+  // Retrieve event document from Firestore
   const doc = await adminDb.collection("events").doc(id).get();
 
   if (!doc.exists) {
@@ -30,6 +49,7 @@ export default async function EventDetails({
     throw new Error("Event data is missing");
   }
 
+  // Construct a type-safe event object
   const event: Event = {
     id: doc.id,
     title: data.title,
@@ -49,12 +69,14 @@ export default async function EventDetails({
           {event.date} • {event.time} • {event.location}
         </p>
 
+        {/* Dynamic map component based on location string */}
         <div className="sticky top-28 bg-white rounded-[2rem] p-8 shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-slate-100">
           <EventMap location={event.location} />
         </div>
 
+        {/* Booking action button */}
         <BookingButton eventId={event.id} />
       </main>
     </>
   );
-}
+}
