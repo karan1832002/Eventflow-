@@ -4,8 +4,11 @@ import { useEffect, useState } from "react";
 import { observeAuth } from "@/lib/auth";
 import { useRouter } from "next/navigation";
 
+// admin-only page for creating a new event
 export default function CreateEventPage() {
   const router = useRouter();
+
+  // one state per form field
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState("");
   const [location, setLocation] = useState("");
@@ -15,6 +18,7 @@ export default function CreateEventPage() {
   const [description, setDescription] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // redirect to login if the user isn't signed in
   useEffect(() => {
     const unsub = observeAuth((user) => {
       if (!user) router.push("/login");
@@ -22,6 +26,7 @@ export default function CreateEventPage() {
     return () => unsub();
   }, [router]);
 
+  // submits the form data to the events API
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -29,9 +34,17 @@ export default function CreateEventPage() {
       const res = await fetch("/api/events", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, category, location, date, time, price: Number(price), description, bookedSeats: [] }),
+        body: JSON.stringify({
+          title, category, location, date, time,
+          price: Number(price),
+          description,
+          bookedSeats: [], // start with no seats booked
+        }),
       });
+
       if (!res.ok) throw new Error("Failed to create event");
+
+      // clear the form and go back to the dashboard
       setTitle(""); setCategory(""); setLocation(""); setDate(""); setTime(""); setPrice(""); setDescription("");
       alert("Event created successfully");
       router.push("/dashboard");
@@ -45,6 +58,7 @@ export default function CreateEventPage() {
   return (
     <main className="mx-auto max-w-3xl px-6 py-10">
       <div className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
+        {/* page heading */}
         <div className="mb-8">
           <p className="text-sm font-semibold uppercase tracking-wide text-indigo-600">Admin Panel</p>
           <h1 className="mt-2 text-3xl font-extrabold text-slate-900">Create Event</h1>
@@ -52,9 +66,21 @@ export default function CreateEventPage() {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
-          <input className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200" placeholder="Event title" value={title} onChange={(e) => setTitle(e.target.value)} required />
+          <input
+            className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
+            placeholder="Event title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            required
+          />
 
-          <select className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200" value={category} onChange={(e) => setCategory(e.target.value)} required>
+          {/* category picker */}
+          <select
+            className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            required
+          >
             <option value="">Select category</option>
             <option value="Music">Music</option>
             <option value="Sports">Sports</option>
@@ -71,18 +97,54 @@ export default function CreateEventPage() {
             <option value="Others">Others</option>
           </select>
 
-          <input className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200" placeholder="Location" value={location} onChange={(e) => setLocation(e.target.value)} required />
+          <input
+            className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
+            placeholder="Location"
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
+            required
+          />
 
+          {/* date and time side by side */}
           <div className="grid gap-5 md:grid-cols-2">
-            <input className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200" type="date" value={date} onChange={(e) => setDate(e.target.value)} required />
-            <input className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200" type="time" value={time} onChange={(e) => setTime(e.target.value)} required />
+            <input
+              className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              required
+            />
+            <input
+              className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
+              type="time"
+              value={time}
+              onChange={(e) => setTime(e.target.value)}
+              required
+            />
           </div>
 
-          <input className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200" type="number" placeholder="Price" value={price} onChange={(e) => setPrice(e.target.value)} required />
+          <input
+            className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
+            type="number"
+            placeholder="Price"
+            value={price}
+            onChange={(e) => setPrice(e.target.value)}
+            required
+          />
 
-          <textarea className="min-h-[140px] w-full rounded-xl border border-slate-300 px-4 py-3 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200" placeholder="Description" value={description} onChange={(e) => setDescription(e.target.value)} rows={5} />
+          <textarea
+            className="min-h-[140px] w-full rounded-xl border border-slate-300 px-4 py-3 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
+            placeholder="Description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            rows={5}
+          />
 
-          <button type="submit" disabled={loading} className="rounded-xl bg-indigo-600 px-6 py-3 font-semibold !text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-70">
+          <button
+            type="submit"
+            disabled={loading}
+            className="rounded-xl bg-indigo-600 px-6 py-3 font-semibold !text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-70"
+          >
             {loading ? "Creating..." : "Create Event"}
           </button>
         </form>

@@ -22,4 +22,4 @@ export const EVENT_CATEGORIES = [
   "Seminar",
   "Conference",
   "Others",
-];
+];

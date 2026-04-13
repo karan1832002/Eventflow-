@@ -1,5 +1,8 @@
 "use client";
 
+// client-side search and filter component for the events list
+// accepts the full event list from the server and filters it locally as the user types
+
 import { useState } from "react";
 import EventCard from "@/components/EventsCard";
 import { EVENT_CATEGORIES } from "@/data/categories";
@@ -10,24 +13,31 @@ export default function SearchBar({ events }: SearchClientProps) {
   const [searchString, setSearchString] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
 
+  // filter runs on every keystroke — no API call needed since we have all events already
   const filteredEvents = events.filter((e) => {
     const query = searchString.trim().toLowerCase();
     let matchesSearch = true;
 
-    // supports "place:london" and "date:2025-06" prefix searches
+    // supports "place:london" to search by location and "date:2025-06" to search by date
     if (query.startsWith("place:")) {
       matchesSearch = e.location.toLowerCase().includes(query.replace("place:", "").trim());
     } else if (query.startsWith("date:")) {
       matchesSearch = e.date.includes(query.replace("date:", "").trim());
     } else {
-      matchesSearch = e.title.toLowerCase().includes(query) || (e.description || "").toLowerCase().includes(query) || (e.location || "").toLowerCase().includes(query);
+      // default: match against title, description, or location
+      matchesSearch =
+        e.title.toLowerCase().includes(query) ||
+        (e.description || "").toLowerCase().includes(query) ||
+        (e.location || "").toLowerCase().includes(query);
     }
 
+    // also filter by category if one is selected
     return matchesSearch && (!selectedCategory || e.category === selectedCategory);
   });
 
   return (
     <>
+      {/* search bar and category dropdown */}
       <form className="mb-6 flex flex-col gap-3 md:flex-row" onSubmit={(e) => e.preventDefault()}>
         <input
           type="text"
@@ -48,8 +58,11 @@ export default function SearchBar({ events }: SearchClientProps) {
         </select>
       </form>
 
+      {/* results grid — shows a message if nothing matches */}
       {filteredEvents.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center text-slate-500">No events found.</div>
+        <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center text-slate-500">
+          No events found.
+        </div>
       ) : (
         <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
           {filteredEvents.map((e) => <EventCard key={e.id} event={e} />)}

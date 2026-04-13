@@ -92,7 +92,7 @@ export default function LoginPage() {
             {loading ? "Logging in..." : "Log in"}
           </button>
         </form>
-        
+
         {/* Navigation Link to Registration */}
         <p className="text-center text-sm text-slate-500 mt-6">
           Don't have an account? <a href="/register" className="font-bold text-indigo-600 hover:text-indigo-500">Sign up</a>
@@ -100,4 +100,4 @@ export default function LoginPage() {
       </div>
     </div>
   );
-}
+}
