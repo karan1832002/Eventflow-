@@ -1,16 +1,8 @@
-// Email helper - sends booking confirmation and payment link emails via Resend
-
 import { Resend } from "resend";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-// Emails the user a link to pay for their booked seats
-export async function sendPaymentLinkEmail({
-  name,
-  email,
-  seats,
-  bookingId,
-}: {
+export async function sendPaymentLinkEmail({ name, email, seats, bookingId }: {
   name: string;
   email: string;
   seats: string[];

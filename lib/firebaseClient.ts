@@ -1,5 +1,3 @@
-// Sets up the Firebase client SDK for use in browser-side components
-
 import { getApp, getApps, initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
@@ -13,7 +11,7 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID!,
 };
 
-// Only initialize Firebase once - avoids errors during hot reload in development
+// don't re-initialize if the app already exists (hot reload safe)
 const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
 
 export const auth = getAuth(app);

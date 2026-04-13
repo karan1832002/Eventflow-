@@ -1,56 +1,34 @@
-// SearchBar - lets users search and filter events by text or category
-
 "use client";
 
 import { useState } from "react";
 import EventCard from "@/components/EventsCard";
 import { EVENT_CATEGORIES } from "@/data/categories";
 
-type SearchClientProps = {
-  events: any[]; // Full list of events passed down from the server
-};
+type SearchClientProps = { events: any[] };
 
 export default function SearchBar({ events }: SearchClientProps) {
   const [searchString, setSearchString] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
 
-  // Filter the event list every time the search text or category changes
   const filteredEvents = events.filter((e) => {
     const query = searchString.trim().toLowerCase();
-
     let matchesSearch = true;
-    let matchesCategory = true;
 
-    // "place:london" searches by location, "date:2025-06" searches by date
+    // supports "place:london" and "date:2025-06" prefix searches
     if (query.startsWith("place:")) {
-      const locationQuery = query.replace("place:", "").trim();
-      matchesSearch = e.location.toLowerCase().includes(locationQuery);
+      matchesSearch = e.location.toLowerCase().includes(query.replace("place:", "").trim());
     } else if (query.startsWith("date:")) {
-      const dateQuery = query.replace("date:", "").trim();
-      matchesSearch = e.date.includes(dateQuery);
+      matchesSearch = e.date.includes(query.replace("date:", "").trim());
     } else {
-      // Default: match against title, description, or location
-      matchesSearch =
-        e.title.toLowerCase().includes(query) ||
-        (e.description || "").toLowerCase().includes(query) ||
-        (e.location || "").toLowerCase().includes(query);
+      matchesSearch = e.title.toLowerCase().includes(query) || (e.description || "").toLowerCase().includes(query) || (e.location || "").toLowerCase().includes(query);
     }
 
-    // Only include events that match the chosen category (if one is selected)
-    if (selectedCategory) {
-      matchesCategory = e.category === selectedCategory;
-    }
-
-    return matchesSearch && matchesCategory;
+    return matchesSearch && (!selectedCategory || e.category === selectedCategory);
   });
 
   return (
     <>
-      <form
-        className="mb-6 flex flex-col gap-3 md:flex-row"
-        onSubmit={(e) => e.preventDefault()}
-      >
-        {/* Text search input */}
+      <form className="mb-6 flex flex-col gap-3 md:flex-row" onSubmit={(e) => e.preventDefault()}>
         <input
           type="text"
           value={searchString}
@@ -58,8 +36,6 @@ export default function SearchBar({ events }: SearchClientProps) {
           placeholder="Search for an event..."
           className="w-full rounded-xl border border-gray-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-300"
         />
-
-        {/* Category filter dropdown */}
         <select
           value={selectedCategory}
           onChange={(e) => setSelectedCategory(e.target.value)}
@@ -67,23 +43,16 @@ export default function SearchBar({ events }: SearchClientProps) {
         >
           <option value="">All Categories</option>
           {EVENT_CATEGORIES.map((category) => (
-            <option key={category} value={category}>
-              {category}
-            </option>
+            <option key={category} value={category}>{category}</option>
           ))}
         </select>
       </form>
 
-      {/* Show a message or the grid of matching events */}
       {filteredEvents.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center text-slate-500">
-          No events found.
-        </div>
+        <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center text-slate-500">No events found.</div>
       ) : (
         <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
-          {filteredEvents.map((e) => (
-            <EventCard key={e.id} event={e} />
-          ))}
+          {filteredEvents.map((e) => <EventCard key={e.id} event={e} />)}
         </div>
       )}
     </>
