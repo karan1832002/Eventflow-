@@ -1,5 +1,4 @@
-<<<<<<< HEAD
-=======
+
 /**
  * app/page.tsx (HomePage)
  * 
@@ -7,7 +6,7 @@
  * Fetches events from Firestore on the server and passes them to the SearchBar for display.
  */
 
->>>>>>> 19b5819a5a5fb3be15ece635a44c4aa2fcb8d07b
+
 import SearchBar from "@/components/SearchEvent";
 import { adminDb } from "@/lib/firebaseAdmin";
 
@@ -28,11 +27,11 @@ export default async function HomePage() {
         </p>
       </div>
 
-<<<<<<< HEAD
+
       {/* search + event grid — this part runs in the browser */}
-=======
+
       {/* Search interface - separated into a client component to handle state/interactivity */}
->>>>>>> 19b5819a5a5fb3be15ece635a44c4aa2fcb8d07b
+
       <SearchBar events={events} />
     </main>
   );
