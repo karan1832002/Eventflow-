@@ -12,7 +12,7 @@ import { useEffect, useState } from "react";
 import { observeAuth, getUserRole } from "@/lib/auth";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { collection, deleteDoc, doc, getDocs, orderBy, query } from "firebase/firestore";
+import { collection, deleteDoc, doc, onSnapshot, orderBy, query } from "firebase/firestore";
 import { db } from "@/lib/firebaseClient";
 import { Calendar, Clock, MapPin, Plus, Trash2, Edit, Ticket } from "lucide-react";
 
@@ -42,44 +42,55 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState("");
 
-  /**
-   * Fetches the list of events from Firestore, ordered by date.
-   */
-  const loadEvents = async () => {
-    const q = query(collection(db, "events"), orderBy("date", "asc"));
-    const snap = await getDocs(q);
-
-    const data = snap.docs.map((docSnap) => ({
-      id: docSnap.id,
-      ...(docSnap.data() as Omit<EventItem, "id">),
-    }));
-
-    setEvents(data);
-  };
+  // This function is no longer needed because we use a real-time listener below
 
   /**
-   * Effect to handle authentication and role validation.
-   * Redirects non-admins to the events page.
+   * This effect runs when you open the dashboard.
+   * It checks if you are an admin and then watches all events in real-time.
    */
   useEffect(() => {
-    const unsub = observeAuth(async (user) => {
+    // Variable to hold the listener for events
+    let unsubEvents: () => void;
+
+    // Watch for login state changes
+    const unsubAuth = observeAuth(async (user) => {
+      // If not logged in, go to login page
       if (!user) {
-        router.push("/login"); // Redirect to login if not authenticated
+        router.push("/login"); 
         return;
       }
 
+      // Check if the user is an admin
       const role = await getUserRole(user.uid);
 
       if (role !== "admin") {
-        router.push("/events"); // Redirect non-admins
+        // If not an admin, they can only view events, not manage them
+        router.push("/events"); 
         return;
       }
 
-      await loadEvents();
-      setLoading(false);
+      // Create a query to get all events, sorted by their date
+      const q = query(collection(db, "events"), orderBy("date", "asc"));
+      
+      // Start listening for any changes to the events (new bookings, edits, etc.)
+      unsubEvents = onSnapshot(q, (snap) => {
+        // Map the database data into our list
+        const data = snap.docs.map((docSnap) => ({
+          id: docSnap.id,
+          ...(docSnap.data() as Omit<EventItem, "id">),
+        }));
+
+        // Update the list on the dashboard
+        setEvents(data);
+        setLoading(false);
+      });
     });
 
-    return () => unsub();
+    // Stop listening when we leave the dashboard
+    return () => {
+      unsubAuth();
+      if (unsubEvents) unsubEvents();
+    };
   }, [router]);
 
   /**

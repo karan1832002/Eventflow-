@@ -11,7 +11,7 @@
 import { useEffect, useState } from "react";
 import { observeAuth } from "@/lib/auth";
 import { useRouter } from "next/navigation";
-import { collection, getDocs, query, where, documentId } from "firebase/firestore";
+import { collection, onSnapshot, query, where, documentId, getDocs } from "firebase/firestore";
 import { db } from "@/lib/firebaseClient";
 import Link from "next/link";
 import { Calendar, MapPin, Ticket } from "lucide-react";
@@ -48,59 +48,78 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
 
   /**
-   * Fetches user bookings and related event info on mount.
+   * This effect runs when the page loads. 
+   * It checks if you are logged in and then listens for your bookings in real-time.
    */
   useEffect(() => {
-    const unsub = observeAuth(async (u) => {
-      // Redirect to login if not authenticated
+    // Variable to hold the listener for bookings so we can stop it later
+    let unsubBookings: () => void;
+
+    // Watch for login state changes
+    const unsubAuth = observeAuth(async (u) => {
+      // If no user is logged in, send them to the login page
       if (!u) {
         router.push("/login");
         return;
       }
+      
+      // Save the user data
       setUser(u);
       
       try {
-        // Query bookings for this user's email
+        // Create a query to find all bookings that belong to this user's email
         const qBookings = query(collection(db, "bookings"), where("email", "==", u.email));
-        const snapBookings = await getDocs(qBookings);
         
-        const userBookings = snapBookings.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        })) as Booking[];
+        // Start listening for any changes to your bookings (real-time)
+        unsubBookings = onSnapshot(qBookings, async (snapBookings) => {
+          // Map the database documents into a list of booking objects
+          const userBookings = snapBookings.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+          })) as Booking[];
 
-        // Handle case with no bookings
-        if (userBookings.length === 0) {
-          setBookings([]);
+          // If there are no bookings, stop here and show the empty state
+          if (userBookings.length === 0) {
+            setBookings([]);
+            setLoading(false);
+            return;
+          }
+
+          // Get a list of unique event IDs from the user's bookings
+          const eventIds = Array.from(new Set(userBookings.map(b => b.eventId)));
+          
+          // Fetch the details (title, date, location) for each event.
+          // We can fetch up to 30 events at once using the 'in' operator.
+          const qEvents = query(collection(db, "events"), where(documentId(), "in", eventIds.slice(0, 30)));
+          const snapEvents = await getDocs(qEvents);
+          
+          // Create a map to quickly look up event details by their ID
+          const eventsMap = new Map();
+          snapEvents.forEach(doc => {
+            eventsMap.set(doc.id, { id: doc.id, ...doc.data() });
+          });
+
+          // Combine the booking data with the event information
+          const merged = userBookings.map(b => ({
+            ...b,
+            event: eventsMap.get(b.eventId)
+          }));
+
+          // Update the state to show the list on the page
+          setBookings(merged);
           setLoading(false);
-          return;
-        }
-
-        // Fetch corresponding events for the bookings
-        const eventIds = Array.from(new Set(userBookings.map(b => b.eventId)));
-        const qEvents = query(collection(db, "events"), where(documentId(), "in", eventIds.slice(0, 10))); // Limit to 10 for simplicity
-        const snapEvents = await getDocs(qEvents);
-        
-        const eventsMap = new Map();
-        snapEvents.forEach(doc => {
-          eventsMap.set(doc.id, { id: doc.id, ...doc.data() });
         });
-
-        // Merge booking data with event info
-        const merged = userBookings.map(b => ({
-          ...b,
-          event: eventsMap.get(b.eventId)
-        }));
-
-        setBookings(merged);
       } catch (err) {
         console.error("Failed to fetch profile data", err);
-      } finally {
         setLoading(false);
       }
     });
 
-    return () => unsub();
+    // Cleanup function: stop listening for auth and bookings when leaving the page
+    return () => {
+      unsubAuth();
+      if (unsubBookings) unsubBookings();
+    };
   }, [router]);
 
   // Loading state view

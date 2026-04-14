@@ -1,7 +1,7 @@
 /**
  * app/page.tsx (HomePage)
  * 
- * The main landing page of the application.
+  The main landing page of the application.
  * Fetches events from Firestore on the server and passes them to the SearchBar for display.
  */
 
@@ -30,7 +30,7 @@ export default async function HomePage() {
         </p>
       </div>
 
-       {/* Search interface - separated into a client component to handle state/interactivity */}
+      {/* Search interface - separated into a client component to handle state/interactivity */}
       <SearchBar events={events} />
     </main>
   );
